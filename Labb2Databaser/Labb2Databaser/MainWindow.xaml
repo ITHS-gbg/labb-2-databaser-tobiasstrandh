@@ -4,11 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Labb2Databaser"
+        xmlns:views="clr-namespace:Labb2Databaser.Views"
+        xmlns:viewmodels="clr-namespace:Labb2Databaser.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button
-           Click="Button_Click"
-        />
+
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type viewmodels:StartViewModel}">
+                <views:StartView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:StoreBalanceViewModel}">
+                    <views:StoreBalance />
+                </DataTemplate>
+
+
+            </Grid.Resources>
+
+        <ContentControl Content="{Binding CurrentViewModel}" />
+
     </Grid>
 </Window>
