@@ -19,7 +19,15 @@ public class StartViewModel : ObservableObject
         _navigationManager = navigationManager;
 
         GoToBalanceViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StoreBalanceViewModel(_navigationManager, _bookStoreManager));
+
+        GoToNewAuthorViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new NewAuthorViewModel(_navigationManager, _bookStoreManager));
+
+        GoToNewBookViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new NewBookViewModel(_navigationManager, _bookStoreManager));
     }
 
     public ICommand GoToBalanceViewCommand { get; }
+
+    public ICommand GoToNewAuthorViewCommand { get; }
+
+    public ICommand GoToNewBookViewCommand { get; }
 }

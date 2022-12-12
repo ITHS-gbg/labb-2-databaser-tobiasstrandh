@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Labb2Databaser.Views
 {
     /// <summary>
-    /// Interaction logic for StoreBalance.xaml
+    /// Interaction logic for NewBookView.xaml
     /// </summary>
-    public partial class StoreBalance : UserControl
+    public partial class NewBookView : UserControl
     {
-        public StoreBalance()
+        public NewBookView()
         {
             InitializeComponent();
         }

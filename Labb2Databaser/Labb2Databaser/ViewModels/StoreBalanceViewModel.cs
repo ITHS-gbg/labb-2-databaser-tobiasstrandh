@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -87,6 +88,13 @@ public class StoreBalanceViewModel : ObservableObject
         }
     }
 
+    private int _amountBooks;
+
+    public int AmountBooks
+    {
+        get { return _amountBooks; }
+        set { SetProperty(ref _amountBooks, value); }
+    }
 
     public void GetBöckerTbl()
     {
@@ -118,27 +126,33 @@ public class StoreBalanceViewModel : ObservableObject
     {
         var bokHandelDbContext = new BokHandelDbContext();
 
-       //var addBook = bokHandelDbContext.BöckerTbls.FirstOrDefault(b => b.Equals(SelectedBook.Isbn));
+        //var addBook = bokHandelDbContext.BöckerTbls.FirstOrDefault(b => b.Equals(SelectedBook.Isbn));
 
 
 
-       var hej = bokHandelDbContext.ButiksSaldoTbls;
-
-      var heja = bokHandelDbContext.ButiksSaldoTbls.FirstOrDefault(b => b.Isbn.Equals(SelectedBook.Isbn) && b.ButiksId.Equals(SelectedStore.Id));
-
-        if (heja.Isbn == SelectedBook.Isbn && heja.ButiksId == SelectedStore.Id)
+        if (SelectedBook != null && AmountBooks >= 0)
         {
-            heja.AntalBöcker = heja.AntalBöcker + 1;
+            var heja = bokHandelDbContext.ButiksSaldoTbls.FirstOrDefault(b => b.Isbn.Equals(SelectedBook.Isbn) && b.ButiksId.Equals(SelectedStore.Id));
+
+            if (heja == null)
+            {
+                var addBook = new ButiksSaldoTbl() { Isbn = SelectedBook.Isbn, ButiksId = SelectedStore.Id, AntalBöcker = AmountBooks };
+
+                bokHandelDbContext.ButiksSaldoTbls.Add(addBook);
+
+            }
+
+            else
+            {
+                heja.AntalBöcker = AmountBooks;
+            }
+
+            bokHandelDbContext.SaveChanges();
+            GetBooksForAStore();
         }
 
-        else
-        {
-            var addBook = new ButiksSaldoTbl() { Isbn = SelectedBook.Isbn, ButiksId = SelectedStore.Id, AntalBöcker = 1 };
-
-            bokHandelDbContext.ButiksSaldoTbls.Add(addBook);
-        }
-
-        bokHandelDbContext.SaveChanges();
     }
+
+
 
 }
