@@ -32,19 +32,52 @@
             Grid.Column="0"
             Grid.ColumnSpan="1"
             Margin="3"
-            ItemsSource="{Binding Authors, UpdateSourceTrigger=PropertyChanged}"
-            SelectedItem="{Binding Author}">
+            ItemsSource="{Binding Books, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding SelectedBook}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn
                 
+                        DisplayMemberBinding="{Binding Titel, UpdateSourceTrigger=PropertyChanged}"
+                        Header="Title" />
+                    <GridViewColumn
+                    
+                        DisplayMemberBinding="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}"
+                        Header="ISBN" />
+                </GridView>
+            </ListView.View>
+
+        </ListView>
+
+        <ListView
+            Grid.Row="3"
+            Grid.RowSpan="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="1"
+            Margin="3"
+            ItemsSource="{Binding Authors, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding Author}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Tag="{Binding Authors, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CheckBox, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn
+                    
                         DisplayMemberBinding="{Binding Förnamn, UpdateSourceTrigger=PropertyChanged}"
                         Header="Firstname" />
+
                     <GridViewColumn
                     
                         DisplayMemberBinding="{Binding Efternamn, UpdateSourceTrigger=PropertyChanged}"
                         Header="Lastname" />
                 </GridView>
+                
             </ListView.View>
 
         </ListView>
@@ -62,16 +95,16 @@
             Grid.Column="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
-            First Name
+            ISBN13
         </TextBlock>
 
         <TextBox
             Grid.Row="0"
             Grid.Column="2"
-            Grid.ColumnSpan="3"
+           
             Margin="5"
             FontSize="18"
-            Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding ISBN13, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap" />
 
         <TextBlock
@@ -79,7 +112,7 @@
             Grid.Column="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
-            LastName
+            Title
         </TextBlock>
 
         <TextBox
@@ -88,7 +121,7 @@
             Grid.ColumnSpan="3"
             Margin="5"
             FontSize="18"
-            Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap" />
 
         <TextBlock
@@ -96,21 +129,64 @@
             Grid.Column="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
-            Date of Birth
+            Date
         </TextBlock>
+
+        <DatePicker
+            Grid.Row="0"
+            Grid.Column="4"
+           
+            
+            FontSize="18"
+            Text="{Binding DateForBook, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBox
+            Grid.Row="2"
+            Grid.Column="4"
+            Margin="5"
+            FontSize="18"
+            Text="{Binding BookPublisher, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap" />
 
         <TextBox
             Grid.Row="2"
             Grid.Column="2"
-            Grid.ColumnSpan="3"
             Margin="5"
             FontSize="18"
-            Text="{Binding DayOfBirth, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding BookGenre, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap" />
 
+        <TextBox
+            Grid.Row="3"
+            Grid.Column="2"
+            Margin="5"
+            FontSize="18"
+            Text="{Binding BookPrice, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap" />
 
+        <TextBox
+            Grid.Row="3"
+            Grid.Column="4"
+            Margin="5"
+            FontSize="18"
+            Text="{Binding Language, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap" />
 
+        <TextBox
+            Grid.Row="4"
+            Grid.Column="4"
+            Margin="5"
+            FontSize="18"
+            Text="{Binding BookFormat, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap" />
 
+        <TextBox
+            Grid.Row="4"
+            Grid.Column="2"
+            Margin="5"
+            FontSize="18"
+            Text="{Binding BookAuthor, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap" />
 
 
 

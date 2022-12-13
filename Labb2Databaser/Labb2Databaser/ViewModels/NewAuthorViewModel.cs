@@ -20,7 +20,7 @@ public class NewAuthorViewModel : ObservableObject
 
         GetFörfattareTbl();
 
-        DayOfBirth = DateTime.MinValue;
+        
 
         ClearCommand = new RelayCommand(() => ClearFields());
 
@@ -142,6 +142,6 @@ public class NewAuthorViewModel : ObservableObject
     {
         FirstName = string.Empty; 
         LastName = string.Empty;
-        DayOfBirth = DateTime.MinValue;
+        DayOfBirth = DateTime.Today;
     }
 }

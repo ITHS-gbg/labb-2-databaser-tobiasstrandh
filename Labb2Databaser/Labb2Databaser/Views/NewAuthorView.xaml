@@ -100,14 +100,13 @@
             Date of Birth
         </TextBlock>
 
-        <TextBox
+        <DatePicker
             Grid.Row="2"
             Grid.Column="2"
             Grid.ColumnSpan="3"
             Margin="5"
             FontSize="18"
-            Text="{Binding DayOfBirth, UpdateSourceTrigger=PropertyChanged}"
-            TextWrapping="Wrap" />
+            Text="{Binding DayOfBirth, UpdateSourceTrigger=PropertyChanged}"/>
 
 
 
