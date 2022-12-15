@@ -34,7 +34,7 @@
             Grid.ColumnSpan="1"
             Margin="3"
             ItemsSource="{Binding Authors, UpdateSourceTrigger=PropertyChanged}"
-            SelectedItem="{Binding Author}">
+            SelectedItem="{Binding SelectedAuthor}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn
@@ -106,7 +106,7 @@
             Grid.ColumnSpan="3"
             Margin="5"
             FontSize="18"
-            Text="{Binding DayOfBirth, UpdateSourceTrigger=PropertyChanged}"/>
+            SelectedDate="{Binding DayOfBirth, UpdateSourceTrigger=PropertyChanged}"/>
 
 
 
@@ -120,8 +120,18 @@
             Margin="15"
             Command="{Binding SaveAuthorCommand}"
             FontSize="16"
-            IsEnabled="{Binding CanSaveOrRemove}">
+            >
             Save
+        </Button>
+
+        <Button
+            Grid.Row="5"
+            Grid.Column="1"
+            Margin="15"
+            Command="{Binding EditAuthorCommand}"
+            FontSize="16"
+          >
+            Edit
         </Button>
 
 

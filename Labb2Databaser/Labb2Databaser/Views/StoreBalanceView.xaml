@@ -37,7 +37,7 @@
             </ListView.View>
         </ListView>
 
-        <ListView Grid.Row="2" ItemsSource="{Binding Books, UpdateSourceTrigger=PropertyChanged}">
+        <ListView Grid.Row="2" ItemsSource="{Binding Books, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedBookToRemove, UpdateSourceTrigger=PropertyChanged}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding IsbnNavigation.Titel, UpdateSourceTrigger=PropertyChanged}" Header="Book" />
@@ -73,6 +73,13 @@
             Margin="20"
             Command="{Binding AddBookCommand}">
             Update
+        </Button>
+
+        <Button
+            Grid.Row="3"
+            Margin="20"
+            Command="{Binding RemoveBookCommand}">
+            Remove book from store
         </Button>
 
     </Grid>

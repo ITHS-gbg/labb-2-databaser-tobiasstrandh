@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,9 +23,12 @@ public class StoreBalanceViewModel : ObservableObject
         GetButikTbl();
      
         AddBookCommand = new RelayCommand(() => AddBook());
+
+        RemoveBookCommand = new RelayCommand(() => RemoveBook());
     }
 
     public ICommand AddBookCommand { get; }
+    public ICommand RemoveBookCommand { get; }
 
     private ObservableCollection<ButikTbl> _stores;
 
@@ -60,7 +64,27 @@ public class StoreBalanceViewModel : ObservableObject
         set
         {
             SetProperty(ref _selectedBook, value);
-           
+            CheckAmountBooks();
+        }
+    }
+
+
+    public void CheckAmountBooks()
+    {
+        var bokHandelDbContext = new BokHandelDbContext();
+
+        var book = bokHandelDbContext.ButiksSaldoTbls.FirstOrDefault(b =>
+            b.Isbn.Equals(SelectedBook.Isbn) && b.ButiksId.Equals(SelectedStore.Id));
+
+        if (book != null)
+        {
+            AmountBooks = book.AntalBöcker;
+            
+        }
+
+        else
+        {
+            AmountBooks = 0;
         }
     }
 
@@ -153,6 +177,34 @@ public class StoreBalanceViewModel : ObservableObject
 
     }
 
+    private ButiksSaldoTbl _selectedBookToRemove;
 
+    public ButiksSaldoTbl SelectedBookToRemove
+    {
+        get { return _selectedBookToRemove; }
+        set
+        {
+            SetProperty(ref _selectedBookToRemove, value);
+        }
+    }
+    public void RemoveBook()
+    {
+        var bokHandelDbContext = new BokHandelDbContext();
+
+        if (SelectedBookToRemove != null)
+        {
+            var bookToRemove = bokHandelDbContext.ButiksSaldoTbls.FirstOrDefault(b =>
+                b.Isbn.Equals(SelectedBookToRemove.Isbn) && b.ButiksId.Equals(SelectedBookToRemove.ButiksId));
+
+            if (bookToRemove != null)
+            {
+                bokHandelDbContext.ButiksSaldoTbls.Remove(bookToRemove);
+                bokHandelDbContext.SaveChanges();
+                GetBooksForAStore();
+            }
+        }
+
+        
+    }
 
 }

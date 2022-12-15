@@ -62,7 +62,7 @@
                     <GridViewColumn>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox Tag="{Binding Authors, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CheckBox, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Tag="{Binding Au, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CheckBox, UpdateSourceTrigger=PropertyChanged}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

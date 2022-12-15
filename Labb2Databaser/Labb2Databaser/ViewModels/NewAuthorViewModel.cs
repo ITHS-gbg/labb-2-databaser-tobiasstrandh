@@ -27,6 +27,8 @@ public class NewAuthorViewModel : ObservableObject
         SaveAuthorCommand = new RelayCommand(() => SaveAuthor());
 
         RemoveAuthorCommand = new RelayCommand(() => RemoveAuthor());
+
+        EditAuthorCommand = new RelayCommand(() => EditAuthor());
     }
 
     public ICommand ClearCommand { get; }
@@ -34,18 +36,22 @@ public class NewAuthorViewModel : ObservableObject
     public ICommand SaveAuthorCommand { get; }
 
     public ICommand RemoveAuthorCommand { get; }
+    public ICommand EditAuthorCommand { get; }
 
-    private FörfattareTbl _author;
+    private FörfattareTbl _selectedAuthor;
 
-    public FörfattareTbl Author
+    public FörfattareTbl SelectedAuthor
     {
-        get { return _author; }
+        get { return _selectedAuthor; }
         set
         {
-            SetProperty(ref _author, value);
-            FirstName = Author.Förnamn;
-            LastName = Author.Efternamn;
-            DayOfBirth = Author.Födelsedatum;
+            SetProperty(ref _selectedAuthor, value);
+            if (SelectedAuthor != null)
+            {
+                FirstName = SelectedAuthor.Förnamn;
+                LastName = SelectedAuthor.Efternamn;
+                DayOfBirth = SelectedAuthor.Födelsedatum;
+            }
         }
     }
 
@@ -70,7 +76,10 @@ public class NewAuthorViewModel : ObservableObject
     public DateTime? DayOfBirth
     {
         get { return _DayOfBirth; }
-        set { SetProperty(ref _DayOfBirth, value); }
+        set
+        {
+            SetProperty(ref _DayOfBirth, value);
+        }
     }
 
     private ObservableCollection<FörfattareTbl> _authors;
@@ -103,13 +112,12 @@ public class NewAuthorViewModel : ObservableObject
         {
             if (author.Förnamn == FirstName && author.Efternamn == LastName)
             {
-               // var hej = bokHandelDbContext.FörfattareTbls.Where(a => a.Förnamn.Equals(FirstName) && a.Efternamn.Equals(LastName));
-               return;
+                return;
             }
         }
 
 
-        if (FirstName != String.Empty && LastName != String.Empty)
+        if (FirstName != String.Empty && LastName != String.Empty && DayOfBirth != null)
         {
             var NewAuthor = new FörfattareTbl() { Förnamn = FirstName, Efternamn = LastName, Födelsedatum = DayOfBirth};
            
@@ -117,6 +125,8 @@ public class NewAuthorViewModel : ObservableObject
             bokHandelDbContext.FörfattareTbls.Add(NewAuthor);
 
             bokHandelDbContext.SaveChanges();
+
+            GetFörfattareTbl();
         }
     }
 
@@ -136,6 +146,25 @@ public class NewAuthorViewModel : ObservableObject
         bokHandelDbContext.FörfattareTbls.Remove(hej);
 
         bokHandelDbContext.SaveChanges();
+
+        GetFörfattareTbl();
+    }
+
+    public void EditAuthor()
+    {
+        var bokHandelDbContext = new BokHandelDbContext();
+
+        var author = bokHandelDbContext.FörfattareTbls.FirstOrDefault(a => a.Id.Equals(SelectedAuthor.Id));
+
+        if (author != null)
+        {
+            author.Förnamn = FirstName;
+            author.Efternamn = LastName;
+            author.Födelsedatum = DayOfBirth;
+            bokHandelDbContext.SaveChanges();
+            GetFörfattareTbl();
+        }
+
     }
 
     public void ClearFields()
@@ -143,5 +172,6 @@ public class NewAuthorViewModel : ObservableObject
         FirstName = string.Empty; 
         LastName = string.Empty;
         DayOfBirth = DateTime.Today;
+       // SelectedAuthor = null;
     }
 }
