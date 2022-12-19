@@ -33,5 +33,5 @@ public partial class BöckerTbl
 
     public virtual SpårkTbl SpråkNavigation { get; set; } = null!;
 
-    public virtual ICollection<FörfattareTbl> Författares { get; } = new List<FörfattareTbl>();
+    public virtual ICollection<FörfattareTbl> Författares { get; set; } = new List<FörfattareTbl>();
 }
