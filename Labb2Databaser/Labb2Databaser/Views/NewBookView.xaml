@@ -50,12 +50,13 @@
         </ListView>
 
         <ListView
-            Grid.Row="3"
-            Grid.RowSpan="3"
-            Grid.Column="1"
+            Grid.Row="4"
+            Grid.RowSpan="1"
+            Grid.Column="2"
             Grid.ColumnSpan="1"
             Margin="3"
-            ItemsSource="{Binding BookAuthor, UpdateSourceTrigger=PropertyChanged}">
+            ItemsSource="{Binding BookAuthor, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding RemoveAuthor, UpdateSourceTrigger=PropertyChanged}">
             <ListView.View>
                 <GridView>
                     
@@ -125,7 +126,8 @@
             Margin="5"
             FontSize="18"
             Text="{Binding ISBN13, UpdateSourceTrigger=PropertyChanged}"
-            TextWrapping="Wrap" />
+            TextWrapping="Wrap"
+            IsEnabled="{Binding CanChangeISBN13, UpdateSourceTrigger=PropertyChanged}"/>
 
         <TextBlock
             Grid.Row="1"
@@ -149,8 +151,57 @@
             Grid.Column="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
+            Genre
+        </TextBlock>
+
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="3"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
             Date
         </TextBlock>
+
+        <TextBlock
+            Grid.Row="2"
+            Grid.Column="3"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            Publisher
+        </TextBlock>
+
+        <TextBlock
+            Grid.Row="3"
+            Grid.Column="3"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            Language
+        </TextBlock>
+
+        <TextBlock
+            Grid.Row="4"
+            Grid.Column="3"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            BookFormat
+        </TextBlock>
+
+        <TextBlock
+            Grid.Row="4"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            Author(s)
+        </TextBlock>
+
+        <TextBlock
+            Grid.Row="3"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            Price
+        </TextBlock>
+
 
         <DatePicker
             Grid.Row="0"
@@ -200,13 +251,7 @@
             Text="{Binding BookFormat, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap" />
 
-        <TextBox
-            Grid.Row="4"
-            Grid.Column="2"
-            Margin="5"
-            FontSize="18"
-            Text="{Binding BookAuthor, UpdateSourceTrigger=PropertyChanged}"
-            TextWrapping="Wrap" />
+     
 
 
 
@@ -216,7 +261,7 @@
             Margin="15"
             Command="{Binding NewBookCommand}"
             FontSize="16"
-            IsEnabled="{Binding CanSaveOrRemove}">
+            IsEnabled="{Binding CanUseSaveButton}">
             Save
         </Button>
 
@@ -233,11 +278,22 @@
 
         <Button
             Grid.Row="5"
-            Grid.Column="4"
+            Grid.Column="1"
             Margin="15"
             Command="{Binding RemoveAuthorCommand}"
-            FontSize="16">
-            Remove
+            FontSize="14">
+            Remove Author
+        </Button>
+
+        <Button
+            Grid.Row="5"
+            Grid.Column="4
+            "
+            Margin="15"
+            Command="{Binding EditBookCommand}"
+            IsEnabled="{Binding CanUseEditButton}"
+            FontSize="14">
+            Save Edit
         </Button>
 
 
