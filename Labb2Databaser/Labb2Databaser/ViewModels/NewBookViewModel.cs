@@ -73,6 +73,7 @@ public class NewBookViewModel : ObservableObject
                 BookPublisher = SelectedBook.Förlag.FörlagNamn;
                 BookFormat = SelectedBook.BokFormat.BokFormat;
                 BookAuthor = new ObservableCollection<FörfattareTbl>(SelectedBook.Författares);
+                Author = null;
                 CanUseSaveButton = false;
                 CanChangeISBN13 = false;
                 CanUseEditButton = true;
@@ -97,15 +98,7 @@ public class NewBookViewModel : ObservableObject
         set
         {
             SetProperty(ref _isbn13, value);
-            if (ISBN13.Length == 13)
-            {
-                CanUseSaveButton = true;
-            }
-
-            else
-            {
-                CanUseSaveButton = false;
-            }
+            CheckFields();
         }
     }
 
@@ -117,6 +110,7 @@ public class NewBookViewModel : ObservableObject
         set
         {
             SetProperty(ref _title, value);
+            CheckFields();
         }
     }
 
@@ -125,7 +119,11 @@ public class NewBookViewModel : ObservableObject
     public DateTime? DateForBook
     {
         get { return _dateForBook; }
-        set { SetProperty(ref _dateForBook, value); }
+        set
+        {
+            SetProperty(ref _dateForBook, value);
+            CheckFields();
+        }
     }
 
     private int? _bookPrice;
@@ -133,7 +131,11 @@ public class NewBookViewModel : ObservableObject
     public int? BookPrice
     {
         get { return _bookPrice; }
-        set { SetProperty(ref _bookPrice, value); }
+        set
+        {
+            SetProperty(ref _bookPrice, value);
+            CheckFields();
+        }
     }
 
     private string _language;
@@ -141,7 +143,11 @@ public class NewBookViewModel : ObservableObject
     public string Language
     {
         get { return _language; }
-        set { SetProperty(ref _language, value); }
+        set
+        {
+            SetProperty(ref _language, value);
+            CheckFields();
+        }
     }
 
     private string? _bookGenre;
@@ -149,7 +155,11 @@ public class NewBookViewModel : ObservableObject
     public string? BookGenre
     {
         get { return _bookGenre; }
-        set { SetProperty(ref _bookGenre, value); }
+        set
+        {
+            SetProperty(ref _bookGenre, value);
+            CheckFields();
+        }
     }
 
     private string _bookPublisher;
@@ -157,7 +167,11 @@ public class NewBookViewModel : ObservableObject
     public string BookPublisher
     {
         get { return _bookPublisher; }
-        set { SetProperty(ref _bookPublisher, value); }
+        set
+        {
+            SetProperty(ref _bookPublisher, value);
+            CheckFields();
+        }
     }
 
     private string _bookFormat;
@@ -165,7 +179,11 @@ public class NewBookViewModel : ObservableObject
     public string BookFormat
     {
         get { return _bookFormat; }
-        set { SetProperty(ref _bookFormat, value); }
+        set
+        {
+            SetProperty(ref _bookFormat, value);
+            CheckFields();
+        }
     }
 
     private ObservableCollection<FörfattareTbl> _bookAuthor = new ObservableCollection<FörfattareTbl>();
@@ -200,7 +218,9 @@ public class NewBookViewModel : ObservableObject
         {
             SetProperty(ref _author, value);
 
-           
+
+            if (Author != null)
+            {
                 foreach (var author in BookAuthor)
                 {
                     if (author.Id == Author.Id)
@@ -210,6 +230,7 @@ public class NewBookViewModel : ObservableObject
                 }
 
                 BookAuthor.Add(Author);
+            }
             
         }
     }
@@ -291,18 +312,29 @@ public class NewBookViewModel : ObservableObject
 
 
         var authors = editBook.Författares;
-        foreach (var bAuthor in BookAuthor)
+        if (authors.Count != 0)
         {
-            foreach (var author in authors.ToList())
+            foreach (var bAuthor in BookAuthor)
             {
-                if (author.Id != bAuthor.Id)
+                foreach (var author in authors.ToList())
                 {
-                  authors.Add(bAuthor);
+                    if (author.Id != bAuthor.Id)
+                    {
+                        authors.Add(bAuthor);
+                    }
                 }
             }
+
+            editBook.Författares = authors;
         }
 
-        editBook.Författares = authors;
+        else
+        {
+            editBook.Författares = BookAuthor;
+        }
+
+
+        
 
 
         var språk = bokHandelDbContext.SpårkTbls
@@ -519,6 +551,89 @@ public class NewBookViewModel : ObservableObject
 
         Authors = new ObservableCollection<FörfattareTbl>(bokHandelDbContext.FörfattareTbls);
 
+    }
+
+    public void CheckFields()
+    {
+        if (ISBN13.Length == 13)
+        {
+            if (Title != String.Empty)
+            {
+                if (DateForBook != null)
+                {
+                    if (BookGenre != String.Empty)
+                    {
+                        if (BookPublisher != String.Empty)
+                        {
+                            if (BookPrice != null)
+                            {
+                                if (Language != String.Empty)
+                                {
+                                    if (BookFormat != String.Empty)
+                                    {
+                                        CanUseSaveButton = true;
+                                    }
+
+                                    else
+                                    {
+                                        CanUseSaveButton = false;
+                                    }
+                                }
+
+                                else
+                                {
+                                    CanUseSaveButton = false;
+                                }
+                            }
+
+                            else
+                            {
+                                CanUseSaveButton = false;
+                            }
+                        }
+
+                        else
+                        {
+                            CanUseSaveButton = false;
+                        }
+                    }
+
+                    else
+                    {
+                        CanUseSaveButton = false;
+                    }
+                }
+
+                else
+                {
+                    CanUseSaveButton = false;
+                }
+            }
+
+            else
+            {
+                CanUseSaveButton = false;
+            }
+        }
+
+        else
+        {
+            CanUseSaveButton = false;
+        }
+
+       ////
+
+        
+
+      
+
+        
+
+       
+
+        
+
+        
     }
 
     public void ClearFields()
