@@ -82,5 +82,13 @@
             Remove book from store
         </Button>
 
+        <Button
+            Grid.Row="3"
+            Grid.Column="1"
+            Margin="20"
+            Command="{Binding GoBackToStartCommand}">
+            Go back to start
+        </Button>
+
     </Grid>
 </UserControl>

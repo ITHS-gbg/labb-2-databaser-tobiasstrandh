@@ -31,6 +31,8 @@ public class NewBookViewModel : ObservableObject
         RemoveAuthorCommand = new RelayCommand(() => RemoveAuthorFromBook());
 
         EditBookCommand = new RelayCommand(() => EditBook());
+
+        RemoveBookCommand = new RelayCommand(() => RemoveBook());
     }
 
     public ICommand RemoveAuthorCommand { get; }
@@ -40,6 +42,8 @@ public class NewBookViewModel : ObservableObject
     public ICommand NewBookCommand { get; }
 
     public ICommand EditBookCommand { get; }
+
+    public ICommand RemoveBookCommand { get; }
 
     private ObservableCollection<BöckerTbl> _books;
 
@@ -93,14 +97,14 @@ public class NewBookViewModel : ObservableObject
         set
         {
             SetProperty(ref _isbn13, value);
-            if (ISBN13 == string.Empty || ISBN13.Length != 13)
+            if (ISBN13.Length == 13)
             {
-                CanUseSaveButton = false;
+                CanUseSaveButton = true;
             }
 
             else
             {
-                CanUseSaveButton = true;
+                CanUseSaveButton = false;
             }
         }
     }
@@ -113,15 +117,6 @@ public class NewBookViewModel : ObservableObject
         set
         {
             SetProperty(ref _title, value);
-            //if (Title == string.Empty)
-            //{
-            //    CanUseSaveButton = false;
-            //}
-
-            //else
-            //{
-            //    CanUseSaveButton = true;
-            //}
         }
     }
 
@@ -174,9 +169,7 @@ public class NewBookViewModel : ObservableObject
     }
 
     private ObservableCollection<FörfattareTbl> _bookAuthor = new ObservableCollection<FörfattareTbl>();
-    /// <summary>
-    /// //
-    /// </summary>
+
     public ObservableCollection<FörfattareTbl> BookAuthor
     {
         get { return _bookAuthor; }
@@ -241,7 +234,7 @@ public class NewBookViewModel : ObservableObject
         set { SetProperty(ref _canUseEditButton, value); }
     }
 
-    private bool _canChangeIsbn13;
+    private bool _canChangeIsbn13 = true;
 
     public bool CanChangeISBN13
     {
@@ -255,27 +248,26 @@ public class NewBookViewModel : ObservableObject
 
         if (RemoveAuthor != null)
         {
-            var hej = bokHandelDbContext.BöckerTbls.Include(a => a.Författares).FirstOrDefault(b => b.Isbn.Equals(ISBN13));
-            var heja = hej.Författares;
-            //= BookAuthor;
+            var author = bokHandelDbContext.BöckerTbls.Include(a => a.Författares).FirstOrDefault(b => b.Isbn.Equals(ISBN13));
+            var authors = author.Författares;
+            
 
-            foreach (var he in heja.ToList())
+            foreach (var aut in authors.ToList())
             {
-                if (he.Id == RemoveAuthor.Id)
+                if (aut.Id == RemoveAuthor.Id)
                 {
-                    heja.Remove(he);
+                    authors.Remove(aut);
                 }
             }
 
-            hej.Författares = heja;
+            author.Författares = authors;
 
             bokHandelDbContext.SaveChanges();
             AllBooks();
-            var author = bokHandelDbContext.BöckerTbls.Include(a => a.Författares).FirstOrDefault(b => b.Isbn.Equals(ISBN13));
-            BookAuthor = new ObservableCollection<FörfattareTbl>(author.Författares);
+            var bookAuthor = bokHandelDbContext.BöckerTbls.Include(a => a.Författares).FirstOrDefault(b => b.Isbn.Equals(ISBN13));
+            BookAuthor = new ObservableCollection<FörfattareTbl>(bookAuthor.Författares);
         }
 
-       //BookAuthor = (ObservableCollection<FörfattareTbl>)heja;
     }
 
     public void EditBook()
@@ -292,7 +284,7 @@ public class NewBookViewModel : ObservableObject
         }
 
 
-        //editBook.Isbn = ISBN13;
+        
         editBook.Titel = Title;
         editBook.Pris = BookPrice;
         editBook.Utgivningsdatum = DateForBook;
@@ -460,7 +452,7 @@ public class NewBookViewModel : ObservableObject
 
         förlag = bokHandelDbContext.FörlagTbls.FirstOrDefault(f => f.FörlagNamn.Equals(BookPublisher));
 
-        //var hej = bokHandelDbContext.F
+        
 
         
 
@@ -474,8 +466,7 @@ public class NewBookViewModel : ObservableObject
             BokFormatId = bokformat.Id,
             GenreId = genre.Id,
             FörlagId = förlag.Id
-            //Författares = BookAuthor
-            //lagt till set
+            
 
         };
 
@@ -484,13 +475,30 @@ public class NewBookViewModel : ObservableObject
        bokHandelDbContext.BöckerTbls.Add(newBook);
        bokHandelDbContext.SaveChanges();
 
-       var hej = bokHandelDbContext.BöckerTbls.FirstOrDefault(b => b.Isbn.Equals(ISBN13));
-       hej.Författares = BookAuthor;
+       var recentlyAddedBook = bokHandelDbContext.BöckerTbls.First(b => b.Isbn.Equals(ISBN13));
+       recentlyAddedBook.Författares = BookAuthor;
 
        bokHandelDbContext.SaveChanges();
 
-
        AllBooks();
+       ClearFields();
+    }
+
+    public void RemoveBook()
+    {
+        var bokHandelDbContext = new BokHandelDbContext();
+
+        if (SelectedBook == null)
+        {
+            return;
+        }
+
+        var book = bokHandelDbContext.BöckerTbls.First(b => b.Isbn.Equals(SelectedBook.Isbn));
+
+        bokHandelDbContext.BöckerTbls.Remove(book);
+        bokHandelDbContext.SaveChanges();
+        AllBooks();
+        ClearFields();
     }
 
     public void AllBooks()
@@ -528,7 +536,7 @@ public class NewBookViewModel : ObservableObject
         CanChangeISBN13 = true;
         CanUseEditButton = false;
 
-        //CanUseSaveButton = true;
+        
     }
 
     private bool _canUseSaveButton;

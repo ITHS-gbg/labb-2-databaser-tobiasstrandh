@@ -25,6 +25,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        
 
         <ListView
             Grid.Row="0"
@@ -276,14 +277,38 @@
             Clear
         </Button>
 
-        <Button
+        <Grid Grid.Row="5" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button
+                
+                Grid.Column="0"
+                Margin="15"
+                Command="{Binding RemoveAuthorCommand}"
+                FontSize="7">
+                Remove Author
+            </Button>
+
+            <Button
+                
+                Grid.Column="1"
+                Margin="15"
+                Command="{Binding RemoveBookCommand}"
+                FontSize="7">
+                Remove book
+            </Button>
+        </Grid>
+
+        <!--<Button
             Grid.Row="5"
             Grid.Column="1"
             Margin="15"
             Command="{Binding RemoveAuthorCommand}"
             FontSize="14">
             Remove Author
-        </Button>
+        </Button>-->
 
         <Button
             Grid.Row="5"

@@ -25,10 +25,14 @@ public class StoreBalanceViewModel : ObservableObject
         AddBookCommand = new RelayCommand(() => AddBook());
 
         RemoveBookCommand = new RelayCommand(() => RemoveBook());
+
+        GoBackToStartCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager, _bookStoreManager));
     }
 
     public ICommand AddBookCommand { get; }
     public ICommand RemoveBookCommand { get; }
+
+    public ICommand GoBackToStartCommand { get; }
 
     private ObservableCollection<ButikTbl> _stores;
 
@@ -149,9 +153,6 @@ public class StoreBalanceViewModel : ObservableObject
     public void AddBook()
     {
         var bokHandelDbContext = new BokHandelDbContext();
-
-        //var addBook = bokHandelDbContext.BöckerTbls.FirstOrDefault(b => b.Equals(SelectedBook.Isbn));
-
 
 
         if (SelectedBook != null && AmountBooks >= 0)

@@ -29,6 +29,8 @@ public class NewAuthorViewModel : ObservableObject
         RemoveAuthorCommand = new RelayCommand(() => RemoveAuthor());
 
         EditAuthorCommand = new RelayCommand(() => EditAuthor());
+
+        GoBackToStartCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager, _bookStoreManager));
     }
 
     public ICommand ClearCommand { get; }
@@ -37,6 +39,8 @@ public class NewAuthorViewModel : ObservableObject
 
     public ICommand RemoveAuthorCommand { get; }
     public ICommand EditAuthorCommand { get; }
+
+    public ICommand GoBackToStartCommand { get; }
 
     private FörfattareTbl _selectedAuthor;
 
@@ -51,6 +55,9 @@ public class NewAuthorViewModel : ObservableObject
                 FirstName = SelectedAuthor.Förnamn;
                 LastName = SelectedAuthor.Efternamn;
                 DayOfBirth = SelectedAuthor.Födelsedatum;
+                CanEditButton = true;
+                CanRemoveButton = true;
+                CanSaveButton = false;
             }
         }
     }
@@ -60,7 +67,14 @@ public class NewAuthorViewModel : ObservableObject
     public string FirstName
     {
         get { return _firstName; }
-        set { SetProperty(ref _firstName, value); }
+        set
+        {
+            SetProperty(ref _firstName, value);
+            if (FirstName != String.Empty && LastName != String.Empty)
+            { 
+                CanSaveButton = true;
+            }
+        }
     }
 
     private string _lastName;
@@ -68,7 +82,14 @@ public class NewAuthorViewModel : ObservableObject
     public string LastName
     {
         get { return _lastName; }
-        set { SetProperty(ref _lastName, value); }
+        set
+        {
+            SetProperty(ref _lastName, value);
+            if (FirstName != String.Empty && LastName != String.Empty)
+            {
+                CanSaveButton = true;
+            }
+        }
     }
 
     private DateTime? _DayOfBirth;
@@ -127,6 +148,7 @@ public class NewAuthorViewModel : ObservableObject
             bokHandelDbContext.SaveChanges();
 
             GetFörfattareTbl();
+            ClearFields();
         }
     }
 
@@ -134,20 +156,21 @@ public class NewAuthorViewModel : ObservableObject
     {
         var bokHandelDbContext = new BokHandelDbContext();
 
-        var hej = bokHandelDbContext.FörfattareTbls.FirstOrDefault(a => a.Förnamn.Equals(FirstName) && a.Efternamn.Equals(LastName));
+        var author = bokHandelDbContext.FörfattareTbls.FirstOrDefault(a => a.Id.Equals(SelectedAuthor.Id));
 
-        if (hej == null || FirstName == null || LastName == null)
+        if (author == null)
         {
             return;
         }
 
         
 
-        bokHandelDbContext.FörfattareTbls.Remove(hej);
+        bokHandelDbContext.FörfattareTbls.Remove(author);
 
         bokHandelDbContext.SaveChanges();
 
         GetFörfattareTbl();
+        ClearFields();
     }
 
     public void EditAuthor()
@@ -163,6 +186,8 @@ public class NewAuthorViewModel : ObservableObject
             author.Födelsedatum = DayOfBirth;
             bokHandelDbContext.SaveChanges();
             GetFörfattareTbl();
+            ClearFields();
+            CanEditButton = false;
         }
 
     }
@@ -172,6 +197,32 @@ public class NewAuthorViewModel : ObservableObject
         FirstName = string.Empty; 
         LastName = string.Empty;
         DayOfBirth = DateTime.Today;
-       // SelectedAuthor = null;
+        SelectedAuthor = null;
+        CanEditButton = false;
+        CanRemoveButton = false;
+    }
+
+    private bool _canEditButton = false;
+
+    public bool CanEditButton
+    {
+        get { return _canEditButton; }
+        set { SetProperty(ref _canEditButton, value); }
+    }
+
+    private bool _canRemoveButton = false;
+
+    public bool CanRemoveButton
+    {
+        get { return _canRemoveButton; }
+        set { SetProperty(ref _canRemoveButton, value); }
+    }
+
+    private bool _canSaveButton = false;
+
+    public bool CanSaveButton
+    {
+        get { return _canSaveButton; }
+        set { SetProperty(ref _canSaveButton, value); }
     }
 }

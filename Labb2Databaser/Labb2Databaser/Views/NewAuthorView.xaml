@@ -120,7 +120,7 @@
             Margin="15"
             Command="{Binding SaveAuthorCommand}"
             FontSize="16"
-            >
+            IsEnabled="{Binding CanSaveButton, UpdateSourceTrigger=PropertyChanged}">
             Save
         </Button>
 
@@ -130,7 +130,7 @@
             Margin="15"
             Command="{Binding EditAuthorCommand}"
             FontSize="16"
-          >
+            IsEnabled="{Binding CanEditButton, UpdateSourceTrigger=PropertyChanged}">
             Edit
         </Button>
 
@@ -150,8 +150,17 @@
             Grid.Column="4"
             Margin="15"
             Command="{Binding RemoveAuthorCommand}"
-            FontSize="16">
+            FontSize="16"
+            IsEnabled="{Binding CanRemoveButton, UpdateSourceTrigger=PropertyChanged}">
             Remove
+        </Button>
+
+        <Button
+            Grid.Row="5"
+            Margin="15"
+            Command="{Binding GoBackToStartCommand}"
+            FontSize="16">
+            Go back to Start
         </Button>
 
 
