@@ -12,17 +12,17 @@ namespace Labb2Databaser.ViewModels;
 public class StartViewModel : ObservableObject
 {
     private readonly NavigationManager _navigationManager;
-   private readonly BookStoreManager _bookStoreManager;
-    public StartViewModel(NavigationManager navigationManager, BookStoreManager bookStoreManager)
+   
+    public StartViewModel(NavigationManager navigationManager)
     {
-        _bookStoreManager = bookStoreManager;
+        
         _navigationManager = navigationManager;
 
-        GoToBalanceViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StoreBalanceViewModel(_navigationManager, _bookStoreManager));
+        GoToBalanceViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StoreBalanceViewModel(_navigationManager));
 
-        GoToNewAuthorViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new NewAuthorViewModel(_navigationManager, _bookStoreManager));
+        GoToNewAuthorViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new NewAuthorViewModel(_navigationManager));
 
-        GoToNewBookViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new NewBookViewModel(_navigationManager, _bookStoreManager));
+        GoToNewBookViewCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new NewBookViewModel(_navigationManager));
     }
 
     public ICommand GoToBalanceViewCommand { get; }

@@ -104,14 +104,6 @@
 
         </ListView>
 
-        <!--<ListView
-            Grid.Row="0"
-            Grid.RowSpan="3"
-            Grid.Column="0"
-            Grid.ColumnSpan="1"
-            Margin="3"
-            ItemsSource="{Binding FileTitles}"
-            SelectedItem="{Binding QuizTitle}" />-->
 
         <TextBlock
             Grid.Column="1"
@@ -256,70 +248,81 @@
 
 
 
-        <Button
-            Grid.Row="5"
-            Grid.Column="2"
-            Margin="15"
-            Command="{Binding NewBookCommand}"
-            FontSize="16"
-            IsEnabled="{Binding CanUseSaveButton}">
-            Save
-        </Button>
+        
 
-
-
-        <Button
-            Grid.Row="5"
-            Grid.Column="3"
-            Margin="15"
-            Command="{Binding ClearCommand}"
-            FontSize="16">
-            Clear
-        </Button>
-
-        <Grid Grid.Row="5" Grid.Column="1">
+        <Grid Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+
             <Button
                 
                 Grid.Column="0"
                 Margin="15"
-                Command="{Binding RemoveAuthorCommand}"
-                FontSize="7">
-                Remove Author
+                Command="{Binding NewBookCommand}"
+                FontSize="16"
+                IsEnabled="{Binding CanUseSaveButton}">
+                Save new
+            </Button>
+
+
+
+            <Button
+                
+                Grid.Column="3"
+                Margin="15"
+                Command="{Binding ClearCommand}"
+                FontSize="12"
+                Content="Clear">
+            </Button>
+
+            <Button
+                
+                Grid.Column="2"
+                Margin="15"
+                Command="{Binding RemoveAuthorFromTheBookCommand}"
+                FontSize="9"
+                Content=" Remove Author"
+                >
+            </Button>
+
+            <Button
+                
+                Grid.Column="4"
+                Margin="15"
+                Command="{Binding RemoveBookCommand}"
+                FontSize="10">
+                Remove book
             </Button>
 
             <Button
                 
                 Grid.Column="1"
                 Margin="15"
-                Command="{Binding RemoveBookCommand}"
-                FontSize="7">
-                Remove book
+                Command="{Binding EditBookCommand}"
+                IsEnabled="{Binding CanUseEditButton}"
+                FontSize="14">
+                Save Edit
+            </Button>
+
+            <Button
+                
+                Grid.Column="5"
+                Margin="15"
+                Command="{Binding GoBackToStartCommand}"
+                FontSize="14">
+                Go back
             </Button>
         </Grid>
 
-        <!--<Button
-            Grid.Row="5"
-            Grid.Column="1"
-            Margin="15"
-            Command="{Binding RemoveAuthorCommand}"
-            FontSize="14">
-            Remove Author
-        </Button>-->
+       
 
-        <Button
-            Grid.Row="5"
-            Grid.Column="4
-            "
-            Margin="15"
-            Command="{Binding EditBookCommand}"
-            IsEnabled="{Binding CanUseEditButton}"
-            FontSize="14">
-            Save Edit
-        </Button>
+        
 
 
     </Grid>

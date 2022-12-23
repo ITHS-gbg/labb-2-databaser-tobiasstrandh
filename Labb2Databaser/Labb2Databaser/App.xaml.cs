@@ -16,21 +16,20 @@ namespace Labb2Databaser
     public partial class App : Application
     {
         private readonly NavigationManager _navigationManager;
-        private readonly BookStoreManager _bookStoreManager;
         public App()
         {
             _navigationManager = new NavigationManager();
-            _bookStoreManager = new BookStoreManager();
+            
         }
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
 
-            _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager, _bookStoreManager);
+            _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager);
 
           
-            var mainWindow = new MainWindow() { DataContext = new MainViewModel(_navigationManager, _bookStoreManager) };
+            var mainWindow = new MainWindow() { DataContext = new MainViewModel(_navigationManager) };
 
             
             mainWindow.Show();

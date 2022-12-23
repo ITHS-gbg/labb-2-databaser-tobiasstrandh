@@ -25,9 +25,6 @@ namespace Labb2Databaser
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+       
     }
 }

@@ -9,33 +9,36 @@ using CommunityToolkit.Mvvm.Input;
 using Labb2Databaser.Managers;
 using Labb2Databaser.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Labb2Databaser.ViewModels;
 
 public class NewBookViewModel : ObservableObject
 {
     private readonly NavigationManager _navigationManager;
-    private readonly BookStoreManager _bookStoreManager;
-    public NewBookViewModel(NavigationManager navigationManager, BookStoreManager bookStoreManager)
+    
+    public NewBookViewModel(NavigationManager navigationManager)
     {
-        _bookStoreManager = bookStoreManager;
+        
         _navigationManager = navigationManager;
         AllBooks();
         GetFörfattareTbl();
 
 
-        ClearCommand = new RelayCommand(() => ClearFields());
+        ClearCommand = new RelayCommand(() => ClearAndUpdate());
 
         NewBookCommand = new RelayCommand(() => AddNewBook());
 
-        RemoveAuthorCommand = new RelayCommand(() => RemoveAuthorFromBook());
+        RemoveAuthorFromTheBookCommand = new RelayCommand(() => RemoveAuthorFromBook());
 
         EditBookCommand = new RelayCommand(() => EditBook());
 
         RemoveBookCommand = new RelayCommand(() => RemoveBook());
+
+        GoBackToStartCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager));
     }
 
-    public ICommand RemoveAuthorCommand { get; }
+    public ICommand RemoveAuthorFromTheBookCommand { get; }
 
     public ICommand ClearCommand { get; }
 
@@ -45,18 +48,20 @@ public class NewBookViewModel : ObservableObject
 
     public ICommand RemoveBookCommand { get; }
 
-    private ObservableCollection<BöckerTbl> _books;
+    public ICommand GoBackToStartCommand { get; }
 
-    public ObservableCollection<BöckerTbl> Books
+    private ObservableCollection<BöckerTbl>? _books;
+
+    public ObservableCollection<BöckerTbl>? Books
     {
         get { return _books; }
         set { SetProperty(ref _books, value); }
     }
 
 
-    private BöckerTbl _selectedBook;
+    private BöckerTbl? _selectedBook;
 
-    public BöckerTbl SelectedBook
+    public BöckerTbl? SelectedBook
     {
         get { return _selectedBook; }
         set
@@ -69,11 +74,11 @@ public class NewBookViewModel : ObservableObject
                 DateForBook = SelectedBook.Utgivningsdatum;
                 BookPrice = SelectedBook.Pris;
                 Language = SelectedBook.SpråkNavigation.Spårk;
-                BookGenre = SelectedBook.Genre.GenreNamn;
-                BookPublisher = SelectedBook.Förlag.FörlagNamn;
-                BookFormat = SelectedBook.BokFormat.BokFormat;
+                BookGenre = SelectedBook.Genre!.GenreNamn;
+                BookPublisher = SelectedBook.Förlag!.FörlagNamn;
+                BookFormat = SelectedBook.BokFormat!.BokFormat;
                 BookAuthor = new ObservableCollection<FörfattareTbl>(SelectedBook.Författares);
-                Author = null;
+                Author = null!;
                 CanUseSaveButton = false;
                 CanChangeISBN13 = false;
                 CanUseEditButton = true;
@@ -82,17 +87,10 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<FörfattareTbl> _checkBox;
+  
+    private string? _isbn13;
 
-    public ObservableCollection<FörfattareTbl> CheckBox
-    {
-        get { return _checkBox; }
-        set { SetProperty(ref _checkBox, value); }
-    }
-
-    private string _isbn13;
-
-    public string ISBN13
+    public string? ISBN13
     {
         get { return _isbn13; }
         set
@@ -102,9 +100,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private string _title;
+    private string? _title;
 
-    public string Title
+    public string? Title
     {
         get { return _title; }
         set
@@ -138,9 +136,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private string _language;
+    private string? _language;
 
-    public string Language
+    public string? Language
     {
         get { return _language; }
         set
@@ -162,9 +160,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private string _bookPublisher;
+    private string? _bookPublisher;
 
-    public string BookPublisher
+    public string? BookPublisher
     {
         get { return _bookPublisher; }
         set
@@ -174,9 +172,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private string _bookFormat;
+    private string? _bookFormat;
 
-    public string BookFormat
+    public string? BookFormat
     {
         get { return _bookFormat; }
         set
@@ -186,9 +184,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<FörfattareTbl> _bookAuthor = new ObservableCollection<FörfattareTbl>();
+    private ObservableCollection<FörfattareTbl>? _bookAuthor = new ObservableCollection<FörfattareTbl>();
 
-    public ObservableCollection<FörfattareTbl> BookAuthor
+    public ObservableCollection<FörfattareTbl>? BookAuthor
     {
         get { return _bookAuthor; }
         set
@@ -197,9 +195,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<FörfattareTbl> _authors;
+    private ObservableCollection<FörfattareTbl>? _authors;
 
-    public ObservableCollection<FörfattareTbl> Authors
+    public ObservableCollection<FörfattareTbl>? Authors
     {
         get { return _authors; }
         set
@@ -209,9 +207,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private FörfattareTbl _author;
+    private FörfattareTbl? _author;
 
-    public FörfattareTbl Author
+    public FörfattareTbl? Author
     {
         get { return _author; }
         set
@@ -221,7 +219,7 @@ public class NewBookViewModel : ObservableObject
 
             if (Author != null)
             {
-                foreach (var author in BookAuthor)
+                foreach (var author in BookAuthor!)
                 {
                     if (author.Id == Author.Id)
                     {
@@ -235,9 +233,9 @@ public class NewBookViewModel : ObservableObject
         }
     }
 
-    private FörfattareTbl _removeAuthor;
+    private FörfattareTbl? _removeAuthor;
 
-    public FörfattareTbl RemoveAuthor
+    public FörfattareTbl? RemoveAuthor
     {
         get { return _removeAuthor; }
         set
@@ -270,6 +268,13 @@ public class NewBookViewModel : ObservableObject
         if (RemoveAuthor != null)
         {
             var author = bokHandelDbContext.BöckerTbls.Include(a => a.Författares).FirstOrDefault(b => b.Isbn.Equals(ISBN13));
+
+            if (author == null)
+            {
+                BookAuthor = null;
+                return;
+            }
+
             var authors = author.Författares;
             
 
@@ -286,234 +291,243 @@ public class NewBookViewModel : ObservableObject
             bokHandelDbContext.SaveChanges();
             AllBooks();
             var bookAuthor = bokHandelDbContext.BöckerTbls.Include(a => a.Författares).FirstOrDefault(b => b.Isbn.Equals(ISBN13));
-            BookAuthor = new ObservableCollection<FörfattareTbl>(bookAuthor.Författares);
+            BookAuthor = new ObservableCollection<FörfattareTbl>(bookAuthor!.Författares);
         }
 
     }
 
     public void EditBook()
     {
-        var bokHandelDbContext = new BokHandelDbContext();
-
-        var editBook = bokHandelDbContext.BöckerTbls
+        
+        using (var bokHandelDbContext = new BokHandelDbContext())
+        {
+            var editBook = bokHandelDbContext.BöckerTbls
             .Include(a => a.Författares)
             .FirstOrDefault(b => b.Isbn.Equals(ISBN13));
 
-        if (editBook == null)
-        {
-            return;
-        }
-
-
-        
-        editBook.Titel = Title;
-        editBook.Pris = BookPrice;
-        editBook.Utgivningsdatum = DateForBook;
-
-
-        var authors = editBook.Författares;
-        if (authors.Count != 0)
-        {
-            foreach (var bAuthor in BookAuthor)
+            if (editBook == null)
             {
-                foreach (var author in authors.ToList())
-                {
-                    if (author.Id != bAuthor.Id)
-                    {
-                        authors.Add(bAuthor);
-                    }
-                }
+                return;
             }
 
-            editBook.Författares = authors;
-        }
-
-        else
-        {
-            editBook.Författares = BookAuthor;
-        }
 
 
-        
+            editBook.Titel = Title!;
+            editBook.Pris = BookPrice;
+            editBook.Utgivningsdatum = DateForBook;
 
 
-        var språk = bokHandelDbContext.SpårkTbls
-            .FirstOrDefault(s => s.Spårk.Equals(Language));
-
-        if (språk == null)
-        {
-            var numberLanguage = bokHandelDbContext.SpårkTbls.OrderBy(s => s.Id).Last();
-
-            var newLanguage = new SpårkTbl() { Spårk = Language, Id = numberLanguage.Id + 1 };
-
-            bokHandelDbContext.SpårkTbls.Add(newLanguage);
-            bokHandelDbContext.SaveChanges();
-
-            språk = bokHandelDbContext.SpårkTbls
-                .First(s => s.Spårk.Equals(Language));
-        }
-
-        editBook.Språk = språk.Id;
-
-        var bokformat = bokHandelDbContext.BokFormatTbls.FirstOrDefault(b => b.BokFormat.Equals(BookFormat));
-
-        if (bokformat == null)
-        {
-            var number = bokHandelDbContext.BokFormatTbls.OrderBy(b => b.Id).Last();
-
-            var newBokformat = new BokFormatTbl() { BokFormat = BookFormat, Id = number.Id + 1 };
-
-            bokHandelDbContext.BokFormatTbls.Add(newBokformat);
-            bokHandelDbContext.SaveChanges();
-
-            bokformat = bokHandelDbContext.BokFormatTbls.First(b => b.BokFormat.Equals(BookFormat));
-        }
-
-        editBook.BokFormatId = bokformat.Id;
-
-        var genre = bokHandelDbContext.GenreTbls.FirstOrDefault(g => g.GenreNamn.Equals(BookGenre));
-        if (genre == null)
-        {
-            var number = bokHandelDbContext.GenreTbls.OrderBy(q => q.Id).Last();
-
-            var newGenre = new GenreTbl() { GenreNamn = BookGenre, Id = number.Id + 1 };
-
-            bokHandelDbContext.GenreTbls.Add(newGenre);
-            bokHandelDbContext.SaveChanges();
-
-            genre = bokHandelDbContext.GenreTbls.First(g => g.GenreNamn.Equals(BookGenre));
-        }
-
-        editBook.GenreId = genre.Id;
-
-        var förlag = bokHandelDbContext.FörlagTbls.FirstOrDefault(f => f.FörlagNamn.Equals(BookPublisher));
-        if (förlag == null)
-        {
-            var number = bokHandelDbContext.FörlagTbls.OrderBy(f => f.Id).Last();
-
-            var newFörlag = new FörlagTbl()
+            var authors = editBook.Författares;
+            if (authors.Count != 0)
             {
-                FörlagNamn = BookPublisher,
-                Id = number.Id + 1
-            };
+                foreach (var bAuthor in BookAuthor!)
+                {
+                    foreach (var author in authors.ToList())
+                    {
+                        if (author.Id != bAuthor.Id)
+                        {
+                            authors.Add(bAuthor);
+                        }
+                    }
+                }
 
-            bokHandelDbContext.FörlagTbls.Add(newFörlag);
+                editBook.Författares = authors;
+            }
+
+            else
+            {
+                editBook.Författares = BookAuthor!;
+            }
+
+
+
+
+
+            var språk = bokHandelDbContext.SpårkTbls
+                .FirstOrDefault(s => s.Spårk.Equals(Language));
+
+            if (språk == null)
+            {
+                var numberLanguage = bokHandelDbContext.SpårkTbls.OrderBy(s => s.Id).Last();
+
+                var newLanguage = new SpårkTbl() { Spårk = Language!, Id = numberLanguage.Id + 1 };
+
+                bokHandelDbContext.SpårkTbls.Add(newLanguage);
+                bokHandelDbContext.SaveChanges();
+
+                språk = bokHandelDbContext.SpårkTbls
+                    .First(s => s.Spårk.Equals(Language));
+            }
+
+            editBook.Språk = språk.Id;
+
+            var bokformat = bokHandelDbContext.BokFormatTbls.FirstOrDefault(b => b.BokFormat.Equals(BookFormat));
+
+            if (bokformat == null)
+            {
+                var number = bokHandelDbContext.BokFormatTbls.OrderBy(b => b.Id).Last();
+
+                var newBokformat = new BokFormatTbl() { BokFormat = BookFormat!, Id = number.Id + 1 };
+
+                bokHandelDbContext.BokFormatTbls.Add(newBokformat);
+                bokHandelDbContext.SaveChanges();
+
+                bokformat = bokHandelDbContext.BokFormatTbls.First(b => b.BokFormat.Equals(BookFormat));
+            }
+
+            editBook.BokFormatId = bokformat.Id;
+
+            var genre = bokHandelDbContext.GenreTbls.FirstOrDefault(g => g.GenreNamn.Equals(BookGenre));
+            if (genre == null)
+            {
+                var number = bokHandelDbContext.GenreTbls.OrderBy(q => q.Id).Last();
+
+                var newGenre = new GenreTbl() { GenreNamn = BookGenre!, Id = number.Id + 1 };
+
+                bokHandelDbContext.GenreTbls.Add(newGenre);
+                bokHandelDbContext.SaveChanges();
+
+                genre = bokHandelDbContext.GenreTbls.First(g => g.GenreNamn.Equals(BookGenre));
+            }
+
+            editBook.GenreId = genre.Id;
+
+            var förlag = bokHandelDbContext.FörlagTbls.FirstOrDefault(f => f.FörlagNamn.Equals(BookPublisher));
+            if (förlag == null)
+            {
+                var number = bokHandelDbContext.FörlagTbls.OrderBy(f => f.Id).Last();
+
+                var newFörlag = new FörlagTbl()
+                {
+                    FörlagNamn = BookPublisher!,
+                    Id = number.Id + 1
+                };
+
+                bokHandelDbContext.FörlagTbls.Add(newFörlag);
+                bokHandelDbContext.SaveChanges();
+
+                förlag = bokHandelDbContext.FörlagTbls.First(f => f.FörlagNamn.Equals(BookPublisher));
+            }
+
+            editBook.FörlagId = förlag.Id;
+
             bokHandelDbContext.SaveChanges();
-
-            förlag = bokHandelDbContext.FörlagTbls.First(f => f.FörlagNamn.Equals(BookPublisher));
+            editBook = null;
+            ClearAndUpdate();
         }
-
-        editBook.FörlagId = förlag.Id;
-
-        bokHandelDbContext.SaveChanges();
-        AllBooks();
     }
 
     public void AddNewBook()
     {
-        var bokHandelDbContext = new BokHandelDbContext();
+        
 
-        var books = bokHandelDbContext.BöckerTbls;
-
-        foreach (var book in books)
+        using (var bokHandelDbContext = new BokHandelDbContext())
         {
-            if (book.Isbn == ISBN13)
+            var books = bokHandelDbContext.BöckerTbls;
+
+            foreach (var book in books)
             {
-                return;
+                if (book.Isbn == ISBN13)
+                {
+                    return;
+                }
             }
-        }
 
-        var språk = bokHandelDbContext.SpårkTbls
-            .FirstOrDefault(s => s.Spårk.Equals(Language));
+            var språk = bokHandelDbContext.SpårkTbls
+                .FirstOrDefault(s => s.Spårk.Equals(Language));
 
-        if (språk == null)
-        {
-            var numberLanguage = bokHandelDbContext.SpårkTbls.OrderBy(s => s.Id).Last();
-
-            var newLanguage = new SpårkTbl() { Spårk = Language, Id = numberLanguage.Id + 1 };
-
-            bokHandelDbContext.SpårkTbls.Add(newLanguage);
-            bokHandelDbContext.SaveChanges();
-
-        }
-
-        var bokformat = bokHandelDbContext.BokFormatTbls.FirstOrDefault(b => b.BokFormat.Equals(BookFormat));
-       
-        if (bokformat == null)
-        {
-            var number = bokHandelDbContext.BokFormatTbls.OrderBy(b => b.Id).Last();
-
-            var newBokformat = new BokFormatTbl() { BokFormat = BookFormat, Id = number.Id + 1 };
-
-            bokHandelDbContext.BokFormatTbls.Add(newBokformat);
-            bokHandelDbContext.SaveChanges();
-        }
-
-        var genre = bokHandelDbContext.GenreTbls.FirstOrDefault(g => g.GenreNamn.Equals(BookGenre));
-        if (genre == null)
-        {
-            var number = bokHandelDbContext.GenreTbls.OrderBy(q => q.Id).Last();
-
-            var newGenre = new GenreTbl() { GenreNamn = BookGenre, Id = number.Id + 1 };
-
-            bokHandelDbContext.GenreTbls.Add(newGenre);
-            bokHandelDbContext.SaveChanges();
-        }
-
-        var förlag = bokHandelDbContext.FörlagTbls.FirstOrDefault(f => f.FörlagNamn.Equals(BookPublisher));
-        if (förlag == null)
-        {
-            var number = bokHandelDbContext.FörlagTbls.OrderBy(f => f.Id).Last();
-
-            var newFörlag = new FörlagTbl()
+            if (språk == null)
             {
-                FörlagNamn = BookPublisher, Id = number.Id + 1
+                var numberLanguage = bokHandelDbContext.SpårkTbls.OrderBy(s => s.Id).Last();
+
+                var newLanguage = new SpårkTbl() { Spårk = Language!, Id = numberLanguage.Id + 1 };
+
+                bokHandelDbContext.SpårkTbls.Add(newLanguage);
+                bokHandelDbContext.SaveChanges();
+
+            }
+
+            var bokformat = bokHandelDbContext.BokFormatTbls.FirstOrDefault(b => b.BokFormat.Equals(BookFormat));
+
+            if (bokformat == null)
+            {
+                var number = bokHandelDbContext.BokFormatTbls.OrderBy(b => b.Id).Last();
+
+                var newBokformat = new BokFormatTbl() { BokFormat = BookFormat!, Id = number.Id + 1 };
+
+                bokHandelDbContext.BokFormatTbls.Add(newBokformat);
+                bokHandelDbContext.SaveChanges();
+            }
+
+            var genre = bokHandelDbContext.GenreTbls.FirstOrDefault(g => g.GenreNamn.Equals(BookGenre));
+            if (genre == null)
+            {
+                var number = bokHandelDbContext.GenreTbls.OrderBy(q => q.Id).Last();
+
+                var newGenre = new GenreTbl() { GenreNamn = BookGenre!, Id = number.Id + 1 };
+
+                bokHandelDbContext.GenreTbls.Add(newGenre);
+                bokHandelDbContext.SaveChanges();
+            }
+
+            var förlag = bokHandelDbContext.FörlagTbls.FirstOrDefault(f => f.FörlagNamn.Equals(BookPublisher));
+            if (förlag == null)
+            {
+                var number = bokHandelDbContext.FörlagTbls.OrderBy(f => f.Id).Last();
+
+                var newFörlag = new FörlagTbl()
+                {
+                    FörlagNamn = BookPublisher!,
+                    Id = number.Id + 1
+                };
+
+                bokHandelDbContext.FörlagTbls.Add(newFörlag);
+                bokHandelDbContext.SaveChanges();
+            }
+
+
+            genre = bokHandelDbContext.GenreTbls.FirstOrDefault(g => g.GenreNamn.Equals(BookGenre));
+
+            språk = bokHandelDbContext.SpårkTbls
+                .FirstOrDefault(s => s.Spårk.Equals(Language));
+
+            bokformat = bokHandelDbContext.BokFormatTbls.FirstOrDefault(b => b.BokFormat.Equals(BookFormat));
+
+            förlag = bokHandelDbContext.FörlagTbls.FirstOrDefault(f => f.FörlagNamn.Equals(BookPublisher));
+
+
+
+
+
+            var newBook = new BöckerTbl()
+            {
+                Isbn = ISBN13!,
+                Titel = Title!,
+                Utgivningsdatum = DateForBook,
+                Pris = BookPrice,
+                Språk = språk!.Id,
+                BokFormatId = bokformat!.Id,
+                GenreId = genre!.Id,
+                FörlagId = förlag!.Id
+
+
             };
 
-            bokHandelDbContext.FörlagTbls.Add(newFörlag);
+
+            bokHandelDbContext.BöckerTbls.Add(newBook);
             bokHandelDbContext.SaveChanges();
-        }
-
-
-        genre = bokHandelDbContext.GenreTbls.FirstOrDefault(g => g.GenreNamn.Equals(BookGenre));
-
-        språk = bokHandelDbContext.SpårkTbls
-            .FirstOrDefault(s => s.Spårk.Equals(Language));
-
-        bokformat = bokHandelDbContext.BokFormatTbls.FirstOrDefault(b => b.BokFormat.Equals(BookFormat));
-
-        förlag = bokHandelDbContext.FörlagTbls.FirstOrDefault(f => f.FörlagNamn.Equals(BookPublisher));
-
-        
-
-        
-
-        var newBook = new BöckerTbl()
-        {
-            Isbn = ISBN13,
-            Titel = Title,
-            Utgivningsdatum = DateForBook,
-            Pris = BookPrice,
-            Språk = språk.Id,
-            BokFormatId = bokformat.Id,
-            GenreId = genre.Id,
-            FörlagId = förlag.Id
             
 
-        };
+            var recentlyAddedBook = bokHandelDbContext.BöckerTbls.First(b => b.Isbn.Equals(ISBN13));
+            recentlyAddedBook.Författares = BookAuthor!;
 
-       
 
-       bokHandelDbContext.BöckerTbls.Add(newBook);
-       bokHandelDbContext.SaveChanges();
+            bokHandelDbContext.SaveChanges();
 
-       var recentlyAddedBook = bokHandelDbContext.BöckerTbls.First(b => b.Isbn.Equals(ISBN13));
-       recentlyAddedBook.Författares = BookAuthor;
 
-       bokHandelDbContext.SaveChanges();
-
-       AllBooks();
-       ClearFields();
+            
+            ClearAndUpdate();
+        }
     }
 
     public void RemoveBook()
@@ -529,8 +543,8 @@ public class NewBookViewModel : ObservableObject
 
         bokHandelDbContext.BöckerTbls.Remove(book);
         bokHandelDbContext.SaveChanges();
-        AllBooks();
-        ClearFields();
+        
+        ClearAndUpdate();
     }
 
     public void AllBooks()
@@ -555,6 +569,12 @@ public class NewBookViewModel : ObservableObject
 
     public void CheckFields()
     {
+        if (ISBN13 == null)
+        {
+            CanUseSaveButton = false;
+            return;
+        }
+
         if (ISBN13.Length == 13)
         {
             if (Title != String.Empty)
@@ -621,37 +641,27 @@ public class NewBookViewModel : ObservableObject
             CanUseSaveButton = false;
         }
 
-       ////
-
-        
-
-      
-
-        
-
-       
-
-        
-
-        
     }
 
-    public void ClearFields()
+    public void ClearAndUpdate()
     {
-        ISBN13 = string.Empty;
-        Title = string.Empty;
+        Books!.Clear();
+        Authors!.Clear();
+        ISBN13 = null;
+        Title = null;
         DateForBook = DateTime.Today;
         BookPrice = null;
-        Language = String.Empty;
-        BookGenre = string.Empty;
-        BookPublisher = string.Empty;
-        BookFormat = string.Empty;
-        BookAuthor = new ObservableCollection<FörfattareTbl>();
-        SelectedBook = null;
+        Language = null;
+        BookGenre = null;
+        BookPublisher = null;
+        BookFormat = null;
+        BookAuthor!.Clear();
+        SelectedBook = null!;
         CanChangeISBN13 = true;
         CanUseEditButton = false;
-
-        
+        Author = null;
+        AllBooks();
+        GetFörfattareTbl();
     }
 
     private bool _canUseSaveButton;

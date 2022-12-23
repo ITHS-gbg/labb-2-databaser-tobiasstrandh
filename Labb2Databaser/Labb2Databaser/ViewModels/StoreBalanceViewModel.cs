@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,10 +16,9 @@ namespace Labb2Databaser.ViewModels;
 public class StoreBalanceViewModel : ObservableObject
 {
     private readonly NavigationManager _navigationManager;
-    private readonly BookStoreManager _bookStoreManager;
-    public StoreBalanceViewModel(NavigationManager navigationManager, BookStoreManager bookStoreManager)
+    public StoreBalanceViewModel(NavigationManager navigationManager)
     {
-        _bookStoreManager = bookStoreManager;
+        
         _navigationManager = navigationManager;
         GetButikTbl();
      
@@ -26,7 +26,7 @@ public class StoreBalanceViewModel : ObservableObject
 
         RemoveBookCommand = new RelayCommand(() => RemoveBook());
 
-        GoBackToStartCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager, _bookStoreManager));
+        GoBackToStartCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager));
     }
 
     public ICommand AddBookCommand { get; }
@@ -34,9 +34,9 @@ public class StoreBalanceViewModel : ObservableObject
 
     public ICommand GoBackToStartCommand { get; }
 
-    private ObservableCollection<ButikTbl> _stores;
+    private ObservableCollection<ButikTbl>? _stores;
 
-    public ObservableCollection<ButikTbl> Stores
+    public ObservableCollection<ButikTbl>? Stores
     {
         get { return _stores; }
         set
@@ -46,9 +46,9 @@ public class StoreBalanceViewModel : ObservableObject
         }
     }
 
-    private ButikTbl _selectedStore;
+    private ButikTbl? _selectedStore;
 
-    public ButikTbl SelectedStore
+    public ButikTbl? SelectedStore
     {
         get { return _selectedStore; }
         set
@@ -60,9 +60,9 @@ public class StoreBalanceViewModel : ObservableObject
     }
 
 
-    private BöckerTbl _selectedBook;
+    private BöckerTbl? _selectedBook;
 
-    public BöckerTbl SelectedBook
+    public BöckerTbl? SelectedBook
     {
         get { return _selectedBook; }
         set
@@ -75,6 +75,11 @@ public class StoreBalanceViewModel : ObservableObject
 
     public void CheckAmountBooks()
     {
+        if (SelectedBook == null || SelectedStore == null)
+        {
+            return;
+        }
+
         var bokHandelDbContext = new BokHandelDbContext();
 
         var book = bokHandelDbContext.ButiksSaldoTbls.FirstOrDefault(b =>
@@ -92,9 +97,9 @@ public class StoreBalanceViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<ButiksSaldoTbl> _books;
+    private ObservableCollection<ButiksSaldoTbl>? _books;
 
-    public ObservableCollection<ButiksSaldoTbl> Books
+    public ObservableCollection<ButiksSaldoTbl>? Books
     {
         get { return _books; }
         set
@@ -104,9 +109,9 @@ public class StoreBalanceViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<BöckerTbl> _allBooks;
+    private ObservableCollection<BöckerTbl>? _allBooks;
 
-    public ObservableCollection<BöckerTbl> AllBooks
+    public ObservableCollection<BöckerTbl>? AllBooks
     {
         get { return _allBooks; }
         set
@@ -121,7 +126,10 @@ public class StoreBalanceViewModel : ObservableObject
     public int AmountBooks
     {
         get { return _amountBooks; }
-        set { SetProperty(ref _amountBooks, value); }
+        set
+        {
+            SetProperty(ref _amountBooks, value);
+        }
     }
 
     public void GetBöckerTbl()
@@ -133,6 +141,11 @@ public class StoreBalanceViewModel : ObservableObject
 
     public void GetBooksForAStore()
     {
+        if (SelectedStore == null)
+        {
+            return;
+        }
+
         var bokHandelDbContext = new BokHandelDbContext();
 
         Books = new ObservableCollection<ButiksSaldoTbl>(bokHandelDbContext.ButiksSaldoTbls.Include(b =>b.IsbnNavigation).Where(s => s.ButiksId.Equals(SelectedStore.Id)));
@@ -154,12 +167,20 @@ public class StoreBalanceViewModel : ObservableObject
     {
         var bokHandelDbContext = new BokHandelDbContext();
 
+        var amount = Convert.ToString(AmountBooks);
 
-        if (SelectedBook != null && AmountBooks >= 0)
+
+        var check = Regex.IsMatch(amount, @"^\d+$");
+        if (check == false)
         {
-            var heja = bokHandelDbContext.ButiksSaldoTbls.FirstOrDefault(b => b.Isbn.Equals(SelectedBook.Isbn) && b.ButiksId.Equals(SelectedStore.Id));
+            return;
+        }
 
-            if (heja == null)
+        if (SelectedBook != null && SelectedStore != null && AmountBooks >= 0)
+        {
+            var doesbookexist = bokHandelDbContext.ButiksSaldoTbls.FirstOrDefault(b => b.Isbn.Equals(SelectedBook.Isbn) && b.ButiksId.Equals(SelectedStore.Id));
+
+            if (doesbookexist == null)
             {
                 var addBook = new ButiksSaldoTbl() { Isbn = SelectedBook.Isbn, ButiksId = SelectedStore.Id, AntalBöcker = AmountBooks };
 
@@ -169,7 +190,7 @@ public class StoreBalanceViewModel : ObservableObject
 
             else
             {
-                heja.AntalBöcker = AmountBooks;
+                doesbookexist.AntalBöcker = AmountBooks;
             }
 
             bokHandelDbContext.SaveChanges();
@@ -178,9 +199,9 @@ public class StoreBalanceViewModel : ObservableObject
 
     }
 
-    private ButiksSaldoTbl _selectedBookToRemove;
+    private ButiksSaldoTbl? _selectedBookToRemove;
 
-    public ButiksSaldoTbl SelectedBookToRemove
+    public ButiksSaldoTbl? SelectedBookToRemove
     {
         get { return _selectedBookToRemove; }
         set

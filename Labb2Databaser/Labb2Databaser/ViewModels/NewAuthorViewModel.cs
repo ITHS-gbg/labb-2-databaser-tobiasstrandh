@@ -12,10 +12,10 @@ namespace Labb2Databaser.ViewModels;
 public class NewAuthorViewModel : ObservableObject
 {
     private readonly NavigationManager _navigationManager;
-    private readonly BookStoreManager _bookStoreManager;
-    public NewAuthorViewModel(NavigationManager navigationManager, BookStoreManager bookStoreManager)
+    
+    public NewAuthorViewModel(NavigationManager navigationManager)
     {
-        _bookStoreManager = bookStoreManager;
+        
         _navigationManager = navigationManager;
 
         GetFörfattareTbl();
@@ -30,7 +30,7 @@ public class NewAuthorViewModel : ObservableObject
 
         EditAuthorCommand = new RelayCommand(() => EditAuthor());
 
-        GoBackToStartCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager, _bookStoreManager));
+        GoBackToStartCommand = new RelayCommand(() => _navigationManager.CurrentViewModel = new StartViewModel(_navigationManager));
     }
 
     public ICommand ClearCommand { get; }
@@ -70,10 +70,7 @@ public class NewAuthorViewModel : ObservableObject
         set
         {
             SetProperty(ref _firstName, value);
-            if (FirstName != String.Empty && LastName != String.Empty)
-            { 
-                CanSaveButton = true;
-            }
+            CheckFields();
         }
     }
 
@@ -85,10 +82,7 @@ public class NewAuthorViewModel : ObservableObject
         set
         {
             SetProperty(ref _lastName, value);
-            if (FirstName != String.Empty && LastName != String.Empty)
-            {
-                CanSaveButton = true;
-            }
+            CheckFields();
         }
     }
 
@@ -100,6 +94,7 @@ public class NewAuthorViewModel : ObservableObject
         set
         {
             SetProperty(ref _DayOfBirth, value);
+            CheckFields();
         }
     }
 
@@ -147,7 +142,7 @@ public class NewAuthorViewModel : ObservableObject
 
             bokHandelDbContext.SaveChanges();
 
-            GetFörfattareTbl();
+            
             ClearFields();
         }
     }
@@ -169,7 +164,7 @@ public class NewAuthorViewModel : ObservableObject
 
         bokHandelDbContext.SaveChanges();
 
-        GetFörfattareTbl();
+        
         ClearFields();
     }
 
@@ -185,7 +180,7 @@ public class NewAuthorViewModel : ObservableObject
             author.Efternamn = LastName;
             author.Födelsedatum = DayOfBirth;
             bokHandelDbContext.SaveChanges();
-            GetFörfattareTbl();
+            
             ClearFields();
             CanEditButton = false;
         }
@@ -194,12 +189,14 @@ public class NewAuthorViewModel : ObservableObject
 
     public void ClearFields()
     {
-        FirstName = string.Empty; 
-        LastName = string.Empty;
+        Authors.Clear();
+        FirstName = null!; 
+        LastName = null!;
         DayOfBirth = DateTime.Today;
-        SelectedAuthor = null;
+        SelectedAuthor = null!;
         CanEditButton = false;
         CanRemoveButton = false;
+        GetFörfattareTbl();
     }
 
     private bool _canEditButton = false;
@@ -225,4 +222,34 @@ public class NewAuthorViewModel : ObservableObject
         get { return _canSaveButton; }
         set { SetProperty(ref _canSaveButton, value); }
     }
+
+    public void CheckFields()
+    {
+        if (FirstName != string.Empty)
+        {
+            if (LastName != string.Empty)
+            {
+                if (DayOfBirth != null)
+                {
+                    CanSaveButton = true;
+                }
+
+                else
+                {
+                    CanSaveButton = false;
+                }
+            }
+
+            else
+            {
+                CanSaveButton = false;
+            }
+        }
+
+        else
+        {
+            CanSaveButton = false;
+        }
+    }
+
 }
